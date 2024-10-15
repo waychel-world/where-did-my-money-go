@@ -11,9 +11,11 @@ n = len(reader.pages)
 df = []
 for page in [str(i+1) for i in range(n)]:
     if page == "1":
-            df.append(read_pdf(file_path, area=(530,12.75,790.5,561), pages=page))
+            df.append(read_pdf(file_path, area=(400,12.75,790.5,560), pages=page))
+    elif int(page) > 6:
+            continue
     else:
-            df.append(read_pdf(file_path, pages=page))
+            df.append(read_pdf(file_path, area=(170,12.75,790.5,560), pages=page))
 
 
 data_frame = pd.DataFrame(df)
@@ -21,3 +23,13 @@ data_frame = pd.DataFrame(df)
 # Save DataFrame to CSV
 csv_output_path = 'transactions.csv'
 data_frame.to_csv(csv_output_path, index=False)
+
+
+
+#FIXES
+#transactions on the last page don't show 
+#if row contains NaN remove it 
+#tagging function
+#reformat for my personal finance excel sheet
+#duplicate and modify bot for the UOB bank statement 
+#sort deposits and withdrawals into different tables

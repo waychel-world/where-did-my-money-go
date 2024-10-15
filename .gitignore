@@ -14,3 +14,6 @@ env/
 .ipynb_checkpoints/
 
 .python-version
+
+
+transactions.csv
