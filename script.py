@@ -22,19 +22,66 @@ for page in [str(i+1) for i in range(n)]:
             temp_df.columns = ['Trans Date', 'Post Date', 'Description', 'Amount (SGD)']
             df = pd.concat([df, temp_df], axis=0, ignore_index=True)
 
-
-# Filter the DataFrame to remove the unwanted rows
-unwanted_strings = ['Ref No.', 'SUB TOTAL', 'TOTAL BALANCE', 'End of Transaction Details', 'MYR', 'USD', 'TWD', 'INR']
+#Filter the DataFrame to remove the unwanted rows
+unwanted_strings = ['Ref No.', 'SUB TOTAL', 'TOTAL BALANCE', 'End of Transaction Details', 'PAYMT THRU E-BANK/HOMEB/CYBERB', 'MYR', 'USD', 'TWD', 'INR']
 condition = df['Description'].str.contains('|'.join(unwanted_strings))
-df_cleaned = df[~condition].reset_index(drop=True)
+df = df[~condition].reset_index(drop=True)
+
+#Tag each transaction with category
+category_map = {
+    'KOPITIAM': 'Food',
+    'NTUC': 'Groceries',
+    'TRIP.COM': 'Travel',
+    'SHOPEE': 'Shopping (Essentials)', #manually check and see if any of the purchases should be reassigned 'Shopping (Fun)'
+    'TADA RIDE': 'Going Out (Transport)',
+    'GRAB RIDES': 'Going Out (Transport)',
+    'BUS/MRT': 'Public Transport',
+    'SIMPLYGO': 'Public Transport',
+    'WARABIMOQI': 'Going Out (Food)',
+    'CHICHA SAN CHEN': 'Going Out (Food)',
+    "STUFF'D": 'Food',
+    '7-ELEVEN': 'Food',
+    'CAROUSELL': 'Shopping (Essentials)', #manually check and see if any of the purchases should be reassigned 'Shopping (Fun)'
+    'F&B': 'Food',
+    'YOLE': 'Going Out (Food)',
+    'HelloRide': 'Cycling',
+    'ADOBESYSTEM': 'Art',
+    'PXD POLE': 'Training',
+    'DIRECT ASIA': 'Travel',
+    'TEA EXPLORER': 'Going Out (Food)',
+    'Kindle Svcs': 'Fun/ Hobbies',
+    'AIRBNB': 'Travel',
+    'GRILL': 'Going Out (Food)',
+    'BAKERY': 'Going Out (Food)',
+    'CIRCLES.LIFE': 'Bills',
+    'SP Digital': 'Bills',
+    'Travel': 'Travel',
+    'AIR-INDIA': 'Travel',
+    'AIRASIA': 'Travel',
+    'APPLE.COM': 'Bills',
+    'FOOD': 'Food',
+    'IndiGo': 'Travel',
+    'GRAB-EC': 'Going Out (Transport)',
+    'CO CHUNG': 'Going Out (Food)',
+    'LIHO': 'Going Out (Food)',
+    'ANDALU.COM ESIM': 'Mutual Aid',
+    'PLAYMADE': 'Going Out (Food)',
+}
+
+def categorize(description):
+    for key, category in category_map.items():
+        if key in description:
+            return category
+    return 'Other'
+
+df['Category'] = df['Description'].apply(categorize)
+
+# Reformat for my personal finance spreadsheet
+new_order = ['Category', 'Amount (SGD)', 'Description']
+df = df[new_order]
 
 # Save DataFrame to CSV
 csv_output_path = 'transactions.csv'
-df_cleaned.to_csv(csv_output_path, index=False)
+df.to_csv(csv_output_path, index=False)
 
-print('success!') 
-
-#FIXES
-#tagging function
-#reformat for my personal finance excel sheet
-#duplicate and modify bot for the UOB bank statement 
+print('success!')
